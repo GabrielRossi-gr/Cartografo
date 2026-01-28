@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MapComponent from '../components/MapComponent';
 import { getFullLocation } from '../services/locationService';
 
 interface LocationData {
@@ -22,6 +23,14 @@ interface LocationData {
   };
   timestamp: string;
 }
+
+const BRASIL_REGION = {
+  latitude: -14.2350,
+  longitude: -51.9253,
+  latitudeDelta: 35, // Zoom amplo para ver o país todo
+  longitudeDelta: 35,
+};
+
 
 export default function CartografoScreen() {
 
@@ -114,10 +123,7 @@ export default function CartografoScreen() {
 
           {/* Placeholder do Mapa */}
           <View style={styles.mapContainer}>
-            <Image 
-              source={{ uri: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/-47.3785,-22.7546,14,0/400x250?access_token=SEU_TOKEN' }} 
-              style={styles.mapImage}
-            />
+            <MapComponent dados={dados} />
           </View>
 
           <View style={{ height: 100 }} />
@@ -152,11 +158,10 @@ const styles = StyleSheet.create({
   header: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
-    // Alinha os elementos pela base do texto (letras alinhadas por baixo)
     alignItems: 'baseline', 
     paddingHorizontal: 20,
     paddingTop: 38,
-    paddingBottom: 0, // Adicionei um pequeno padding para não colarem no card abaixo
+    paddingBottom: 0, 
     marginBottom: 0 
   },
   headerTitle: { fontSize: 30, fontWeight: 'bold', color: '#FFF' },
@@ -193,6 +198,8 @@ const styles = StyleSheet.create({
   coordBox: { flex: 1, flexDirection: 'row', paddingLeft: 15, paddingVertical: 12, justifyContent: 'space-between' },
   coordBorder: { borderRightWidth: 1, borderRightColor: '#333' },
 
+
+
   altitudeBox: { 
     backgroundColor: '#1C1C1E', 
     borderRadius: 12, 
@@ -210,18 +217,31 @@ const styles = StyleSheet.create({
 
   //label: { color: '#ffffff', fontSize: 14 },
   //value: { color: '#8E8E93', fontSize: 14 },
-
   label: { color: '#ffffff', fontSize: 14 },
   value: { color: '#b3b3b9', fontSize: 14, paddingRight: 15},
-
   //label: { color: '#c6c6cc', fontSize: 14 },
   //value: { color: '#FFFFFF', fontSize: 14 },
   
+
+
   subLabel: { color: '#8E8E93', fontSize: 13 },
 
-  mapContainer: { borderRadius: 20, overflow: 'hidden', marginBottom: 25 },
-  mapImage: { width: '100%', height: 200, backgroundColor: '#333' },
 
+
+  mapContainer: {
+    height: 250,          // Altura fixa para o mapa no celular
+    width: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',    // Garante que o mapa respeite o arredondamento das bordas
+    backgroundColor: '#1A1A1A',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  map: {width: '100%', height: '100%'},
+ 
+
+  
   buttonContainer: {
     position: 'absolute', // Faz ele flutuar
     bottom: 30,           // Distância da borda inferior
