@@ -1,7 +1,45 @@
-import React from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getFullLocation } from '../services/locationService';
+
+interface LocationData {
+  coords: {
+    latitude: string;
+    longitude: string;
+    altitude: string;
+    accuracy: string;
+    speed: string;
+    heading: string;
+  };
+  address: {
+    street: string;
+    district: string;
+    city: string;
+    region: string;
+    postalCode: string;
+    country: string;
+    isoCountryCode: string;
+  };
+  timestamp: string;
+}
 
 export default function CartografoScreen() {
+
+  const [loading, setLoading] = useState(false);
+  const [dados, setDados] = useState<LocationData | null>(null); // Aqui ficará o objeto retornado pela função
+
+
+  const handleSearchLocation = async () => {
+    setLoading(true);
+    const result = await getFullLocation();
+    
+    if (result) {
+      setDados(result);
+      console.log(dados) //para ver no terminal
+    }
+    setLoading(false);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
 
@@ -9,7 +47,7 @@ export default function CartografoScreen() {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Cartógrafo</Text>
           <View style={styles.countryBadge}>
-            <Text style={styles.countryText}>+55 Brasil</Text>
+            <Text style={styles.countryText}>{dados?.address.isoCountryCode ?? "ND#"} {dados?.address.country ?? "ND#"}</Text>
             <Text style={styles.flagEmoji}>BR</Text>
           </View>
         </View>
@@ -20,22 +58,22 @@ export default function CartografoScreen() {
           <View style={styles.addressCard}>
             <View style={styles.row}>
               <Text style={styles.label}>Rua/Logradouro:</Text>
-              <Text style={styles.value}>Rua do Café</Text>
+              <Text style={styles.value}> {dados?.address.street ?? "Não encontrado!!"} </Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.row}>
               <Text style={styles.label}>Bairro:</Text>
-              <Text style={styles.value}>Mollon</Text>
+              <Text style={styles.value}> {dados?.address.district ?? "Não encontrado!!"} </Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.row}>
               <Text style={styles.label}>Cidade:</Text>
-              <Text style={styles.value}>Santa Bárbara d'Oeste</Text>
+              <Text style={styles.value}> {dados?.address.city ?? "Não encontrado!!"} </Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.row}>
               <Text style={styles.label}>CEP:</Text>
-              <Text style={styles.value}>13456-000</Text>
+              <Text style={styles.value}> {dados?.address.postalCode ?? "Não encontrado!!"} </Text>
             </View>
           </View>
 
@@ -44,11 +82,11 @@ export default function CartografoScreen() {
           <View style={styles.coordsRow}>
             <View style={[styles.coordBox, styles.coordBorder]}>
               <Text style={styles.label}>Lat:</Text>
-              <Text style={styles.value}>-22.7546945</Text>
+              <Text style={styles.value}> {dados?.coords.latitude ?? "ND#"} </Text>
             </View>
             <View style={styles.coordBox}>
               <Text style={styles.label}>Lon:</Text>
-              <Text style={styles.value}>-22.7546945</Text>
+              <Text style={styles.value}> {dados?.coords.longitude ?? "ND#"} </Text>
             </View>
           </View>
 
@@ -57,15 +95,19 @@ export default function CartografoScreen() {
           {/* Altitude */}
           <View style={styles.altitudeBox}>
             <Text style={styles.label}>Altitude:</Text>
-            <Text style={styles.value}>560 metros (↑ nível do mar)</Text>
+            <Text style={styles.value}>
+              {dados?.coords.altitude 
+                ? `${dados.coords.altitude} metros (↑ nível do mar)` 
+                : "Não encontrado!!"}
+            </Text>
           </View>
 
 
 
           {/* Stats Pequenos */}
           <View style={styles.statsRow}>
-            <Text style={styles.subLabel}>Precisão do sinal: 5 metros</Text>
-            <Text style={styles.subLabel}>Velocidade: 0 km/h</Text>
+            <Text style={styles.subLabel}>Precisão do sinal: {dados?.coords.accuracy ?? "0"} metros</Text>
+            <Text style={styles.subLabel}>Velocidade: {dados?.coords.speed ?? "0"} km/h</Text>
           </View>
 
 
@@ -78,33 +120,46 @@ export default function CartografoScreen() {
             />
           </View>
 
-
           <View style={{ height: 100 }} />
         </ScrollView>
 
       
+        
+
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.searchButton} activeOpacity={0.8}>
-            <Text style={styles.buttonText}>📍 Pesquisar sua Localização</Text>
+          <TouchableOpacity 
+            style={[styles.searchButton, loading && { backgroundColor: '#CCAC00' }]} 
+            activeOpacity={0.8}
+            onPress={handleSearchLocation}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.buttonText}>📍 Pesquisar sua Localização</Text>
+            )}
           </TouchableOpacity>
         </View>
+
+
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#222' },
+  safeArea: { flex: 1, backgroundColor: '#3A3A3C' },
   container: { padding: 20 },
   header: { 
     flexDirection: 'row', 
     justifyContent: 'space-between', 
-    alignItems: 'center', 
+    // Alinha os elementos pela base do texto (letras alinhadas por baixo)
+    alignItems: 'baseline', 
     paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 10,
+    paddingTop: 38,
+    paddingBottom: 0, // Adicionei um pequeno padding para não colarem no card abaixo
     marginBottom: 0 
   },
-  headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#FFF' },
+  headerTitle: { fontSize: 30, fontWeight: 'bold', color: '#FFF' },
   countryBadge: { flexDirection: 'row', alignItems: 'center' },
   countryText: { color: '#4ADE80', fontSize: 18, marginRight: 8 },
   flagEmoji: { fontSize: 24 },
@@ -112,34 +167,36 @@ const styles = StyleSheet.create({
 
 
   addressCard: { 
-    backgroundColor: '#1A1A1A', 
+    backgroundColor: '#1C1C1E', 
     borderRadius: 12, 
-    paddingHorizontal: 15,
+    //paddingHorizontal: 15,
+    paddingLeft: 15,
     paddingVertical: 4,
+    paddingRight: 4,
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#333'
   },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
-  separator: { height: 1, backgroundColor: '#333', marginVertical: 2 },
+  separator: { height: 0.5, backgroundColor: '#545458', marginLeft: 2},
   
 
   
   coordsRow: { 
     flexDirection: 'row', 
-    backgroundColor: '#1A1A1A', 
+    backgroundColor: '#1C1C1E', 
     borderRadius: 12, 
     marginBottom: 4,
     borderWidth: 1,
     borderColor: '#333'
   },
-  coordBox: { flex: 1, flexDirection: 'row', paddingHorizontal: 15, paddingVertical: 12, justifyContent: 'space-between' },
+  coordBox: { flex: 1, flexDirection: 'row', paddingLeft: 15, paddingVertical: 12, justifyContent: 'space-between' },
   coordBorder: { borderRightWidth: 1, borderRightColor: '#333' },
 
   altitudeBox: { 
-    backgroundColor: '#1A1A1A', 
+    backgroundColor: '#1C1C1E', 
     borderRadius: 12, 
-    paddingHorizontal: 15,
+    paddingLeft: 15,
     paddingVertical: 12, 
     flexDirection: 'row', 
     justifyContent: 'space-between',
@@ -149,9 +206,18 @@ const styles = StyleSheet.create({
   },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 32 },
   
-  label: { color: '#AAA', fontSize: 14 },
-  value: { color: '#FFF', fontSize: 14, fontWeight: '500' },
-  subLabel: { color: '#666', fontSize: 12 },
+
+
+  //label: { color: '#ffffff', fontSize: 14 },
+  //value: { color: '#8E8E93', fontSize: 14 },
+
+  label: { color: '#ffffff', fontSize: 14 },
+  value: { color: '#b3b3b9', fontSize: 14, paddingRight: 15},
+
+  //label: { color: '#c6c6cc', fontSize: 14 },
+  //value: { color: '#FFFFFF', fontSize: 14 },
+  
+  subLabel: { color: '#8E8E93', fontSize: 13 },
 
   mapContainer: { borderRadius: 20, overflow: 'hidden', marginBottom: 25 },
   mapImage: { width: '100%', height: 200, backgroundColor: '#333' },
