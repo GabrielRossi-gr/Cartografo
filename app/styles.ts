@@ -1,4 +1,4 @@
-import { Platform, StatusBar, StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 // Paleta de cores oficial da Apple (Dark Mode)
 const AppleColors = {
@@ -24,36 +24,41 @@ export default StyleSheet.create({
     width: "100%",
     zIndex: 100,
   },
+
+
+
+  
   blurContainer: {
-    paddingTop:
-      Platform.OS === "ios" ? 60 : (StatusBar.currentHeight ?? 0) + 10,
-    paddingBottom: 15,
-    paddingHorizontal: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: AppleColors.separator,
+    padding: 16,
+    paddingTop: 50, // Ajuste conforme sua StatusBar
   },
-  headerTopRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 4,
-  },
-  countryBadge: {
-    backgroundColor: AppleColors.tertiaryBackground,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  countryText: {
-    color: AppleColors.systemBlue,
-    fontSize: 12,
-    fontWeight: "600",
+  mainRow: {
+    flexDirection: "row",         // Coloca título e bloco de localização lado a lado
+    justifyContent: "space-between", // Empurra o título para a esquerda e o grupo para a direita
+    alignItems: "center",         // Alinha o centro do título com o centro da bandeira/país
   },
   largeTitle: {
-    fontSize: 34,
-    fontWeight: "800",
-    color: AppleColors.label,
-    letterSpacing: 0.4,
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
   },
+  locationGroup: {
+    flexDirection: "row",         // Coloca o texto do país e a bandeira lado a lado
+    alignItems: "center",         // Alinha o texto com o centro da bandeira
+  },
+  countryText: {
+    color: "#30D158",
+    fontSize: 14,
+    marginRight: 8,               // Espaço entre o nome do país e a bandeira
+    textAlign: "right",           // Garante que o texto alinhe à direita se quebrar
+  },
+  flagStyle: {
+    // Caso queira algum ajuste fino na posição da bandeira
+  },
+
+   
+  
+  
 
   // Conteúdo e Listas (Inset Grouped)
   scrollContent: {

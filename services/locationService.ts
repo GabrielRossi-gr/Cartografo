@@ -12,7 +12,9 @@ export async function getFullLocation() {
     const { latitude, longitude, altitude, accuracy, speed, heading } = location.coords;
 
     const [address] = await Location.reverseGeocodeAsync({ latitude, longitude });
-
+    
+    console.log("---")
+    
     return {
       coords: {
         latitude: latitude.toString(),
@@ -26,7 +28,7 @@ export async function getFullLocation() {
       address: {
         street: address?.street || "",
         district: address?.district || "",
-        city: address?.subregion || address?.city || "",
+        city: address?.city || "",
         region: address?.region || "",
         postalCode: address?.postalCode || "",
         country: address?.country || "",

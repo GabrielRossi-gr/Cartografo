@@ -1,3 +1,4 @@
+import CountryFlag from "@/components/CountryFlag";
 import { BlurView } from "expo-blur"; // IMPORTAÇÃO OBRIGATÓRIA
 import React, { useState } from "react";
 import {
@@ -53,15 +54,24 @@ export default function CartografoScreen() {
       {/* HEADER ESTILO IOS - Agora descomentado e usando os nomes corretos do styles.ts */}
       <View style={styles.headerWrapper}>
         <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
-          <View style={styles.headerTopRow}>
-            <View style={styles.countryBadge}>
+          
+          <View style={styles.mainRow}>
+            {/* Título na Esquerda */}
+            <Text style={styles.largeTitle}>Cartógrafo</Text>
+
+            {/* Bloco de localização na Direita */}
+            <View style={styles.locationGroup}>
               <Text style={styles.countryText}>
-                {dados?.address.isoCountryCode ?? "BR"}{" "}
-                {dados?.address.country ?? "Brasil"}
+                {dados?.address.country ?? "--"}
               </Text>
+              <CountryFlag 
+                isoCode={dados?.address.isoCountryCode} 
+                size={32} 
+                style={styles.flagStyle} 
+              />
             </View>
           </View>
-          <Text style={styles.largeTitle}>Cartógrafo</Text>
+
         </BlurView>
       </View>
 
